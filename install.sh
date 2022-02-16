@@ -14,7 +14,6 @@ echo 'export DBHOST=localhost >> ~/.bashrc
 echo 'export DBPORT=5432 >> ~/.bashrc
 #to execute in the current session
 .~/.bashrc
-exit
 
 #Create a virtual environment and installing application packages
 sudo apt update
