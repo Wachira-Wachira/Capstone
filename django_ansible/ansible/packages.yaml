@@ -1,0 +1,21 @@
+---
+- hosts: webservers
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Running apt update
+      apt: update_cache=yes
+    - name: Installing required packages
+      apt: name={{ item }} state=present
+      with_items:
+       - fail2ban
+       - postgresql
+       - postgresql-client
+       - git
+       - python3-pip
+       - rdiff-backup
+       - libpq-dev
+       - python3-psycopg2
+       - uwsgi
+       - uwsgi-plugin-python3
+       - nginx

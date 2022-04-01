@@ -1,0 +1,7 @@
+#[local]
+#localhost ansible_connection=local
+
+[webservers]
+3.144.175.29 ansible_user=ubuntu
+ 
+

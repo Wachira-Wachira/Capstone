@@ -1,0 +1,35 @@
+---
+- name: Copy configuration files
+  hosts: webservers
+  become: yes
+  gather_facts: no
+
+  tasks:
+    - name: delete default configuration
+      file: path=/etc/nginx/sites-available/default state=absent
+
+    - name: nginx config file
+      template: src=../config/nginx.conf dest=/etc/nginx/sites-available/django
+      notify:
+      - restart nginx
+
+    - name: Create sym link  
+      file: src=/etc/nginx/sites-available/django dest=/etc/nginx/sites-enabled/default state=link
+      notify:
+      - restart nginx
+
+    - name: uwsgi config file
+      template: src=../config/uwsgi.ini dest=/etc/uwsgi/apps-enabled/django
+      notify:
+      - restart uwsgi
+
+#    - name: Create sym link
+ #     file: src=/etc/uwsgi/apps-available/django dest=/etc/uwsgi/apps-enabled/default state=link
+  #    notify:
+   #   - restart uwsgi
+ 
+  handlers:
+    - name: restart nginx
+      service: name=nginx state=restarted
+    - name: restart uwsgi
+      service: name=uwsgi state=restarted

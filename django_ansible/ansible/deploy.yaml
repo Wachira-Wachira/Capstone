@@ -1,0 +1,36 @@
+---
+- hosts: webservers
+  become: yes
+  become_user: ubuntu
+  gather_facts: no
+
+  tasks:
+  - name: pull branch master
+    git:
+      repo=https://github.com/AzubiAfrica/Mobalysis.git
+      dest=/home/ubuntu/django
+      accept_hostkey=yes
+ 
+  - name: create static_root dir
+    file: path=/home/ubuntu/django/staticfiles state=directory mode=0755
+
+  - name: install python requirements
+    become: yes   
+    pip: requirements=/home/zippy/django_backup/django_ansible/requirements.txt
+    environment:
+      DJANGO_SETTINGS_MODULE: /home/zippy/django_backup/django_ansible/django/yourproject/settings/settings.py
+      DATABASE_URL: postgres://mob_db_usr:mob_db_pass@localhost/mobalysis
+      STATIC_ROOT: /home/ubuntu/django/staticfiles
+  
+  - name: django collectstatic
+    shell: ./manage.py collectstatic --noinput chdir=/home/ubuntu/django/staticfiles
+  - name: django migrate
+    shell: ./manage.py migrate --noinput chdir=/home/ubuntu/django/staticfiles
+  - name: django loaddata
+    shell: ./manage.py loaddata user chdir=/home/ubuntu/django/staticfiles
+
+- hosts: webservers
+  gather_facts: no
+  tasks:
+  - name: uwsgi restart
+    service: name=uwsgi state=restarted
